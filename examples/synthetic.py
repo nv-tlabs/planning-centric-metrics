@@ -18,6 +18,7 @@ from nuscenes.eval.detection.evaluate import DetectionEval
 from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.eval.common.config import config_factory
+import os
 
 from planning_centric_metrics import calculate_pkl
 

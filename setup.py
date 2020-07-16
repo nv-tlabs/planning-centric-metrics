@@ -4,6 +4,8 @@
 # Note: To use the 'upload' functionality of this file, you must:
 #   $ pipenv install twine --dev
 
+# based on https://github.com/ccdcoe/roboblue/blob/master/robobluekit/setup.py
+
 import io
 import os
 import sys
@@ -14,12 +16,12 @@ from setuptools import find_packages, setup, Command
 # Package meta-data.
 NAME = 'planning_centric_metrics'
 DESCRIPTION = 'API for computing "Planning KL-Divergence" (https://arxiv.org/abs/2004.08745)'
-URL = ''
+URL = 'https://github.com/nv-tlabs/planning-centric-metrics'
 EMAIL = 'jonahphilion@gmail.com'
 AUTHOR = 'Jonah Philion'
 REQUIRES_PYTHON = '>=3.6.0'
 
-# What packages are required for this module to be executed?
+# a subset of the nuscenes-devkit requirements
 REQUIRED = [
     'torch>=1.3.1', 'ujson', 'numpy', 'matplotlib',
     'opencv-python', 'pyquaternion', 'tqdm',
@@ -80,10 +82,11 @@ class UploadCommand(Command):
             pass
 
         self.status('Building Source and Wheel (universal) distribution…')
-        os.system('{0} setup.py sdist bdist_wheel --universal'.format(sys.executable))
+        os.system('{0} setup.py sdist'.format(sys.executable))
+        os.system('pip wheel --no-index --no-deps --wheel-dir dist dist/*.tar.gz')
 
-        # self.status('Uploading the package to PyPI via Twine…')
-        # os.system('twine upload dist/*')
+        self.status('Uploading the package to PyPI via Twine…')
+        os.system('twine upload dist/*')
 
         self.status('Pushing git tags…')
         os.system('git tag v{0}'.format(about['__version__']))
@@ -103,7 +106,7 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+    packages=find_packages(),
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
@@ -112,8 +115,7 @@ setup(
     # },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
-    include_package_data=True,
-    license='MIT',
+    license='Apache 2.0',
     classifiers=[
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers

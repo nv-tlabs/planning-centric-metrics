@@ -13,3 +13,6 @@
 # limitations under the License.
 
 from .planning_kl import calculate_pkl
+from .__version__ import __version__
+
+__all__ = ['calculate_pkl', '__version__']

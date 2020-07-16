@@ -28,10 +28,10 @@ year = {2020}
 
 We show how to evaluate PKL for a synthetic detection submission using a pretrained planner. Instructions for training models yourself can be found in the "Full Tutorial" section. We assume that [nuScenes](https://www.nuscenes.org/download) is located at `NUSCENES_ROOT` and nuScenes maps are located at `NUSCENES_MAP_ROOT`.
 
-Install the `planning_centric_metrics` package.
+Install the `planning-centric-metrics` package (or install locally with `pip install -e .`).
 
 ```
-pip install -e .
+pip install planning-centric-metrics
 ```
 
 The `planning_centric_metrics` package has one exposed function (`calculate_pkl`) and the API is shown below.
