@@ -72,7 +72,7 @@ Visualization of inputs and outputs of the "planner".
 ```
 python main.py viz_data mini --dataroot=NUSCENES_ROOT --map_folder=NUSCENES_MAP_ROOT
 ```
-
+![Kiku](./imgs/check.gif)
 <img src="./imgs/check.gif">
 
 ### Generate masks
