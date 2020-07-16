@@ -34,7 +34,7 @@ Install the `planning-centric-metrics` package (or install locally with `pip ins
 pip install planning-centric-metrics
 ```
 
-The `planning_centric_metrics` package has one exposed function (`calculate_pkl`) and the API is shown below.
+The `planning-centric-metrics` package has one exposed function (`calculate_pkl`) and the API is shown below.
 
 ```
 nusc_eval = DetectionEval(nusc, config=cfg,
