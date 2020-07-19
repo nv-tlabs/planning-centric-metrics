@@ -50,7 +50,7 @@ info = planning_centric_metrics.calculate_pkl(nusc_eval.gt_boxes, nusc_eval.pred
 ```
 An example script that uses the `planning_centric_metrics` package to calculate the PKL for a synthetic detector can be found in `examples/synthetic.py`. Set `--gpuid=-1` to use the CPU.
 ```
-python examples/synthetic.py quick_test--dataroot=NUSCENES_ROOT --map_folder=NUSCENES_MAP_ROOT --gpuid=0 --nworkers=10
+python examples/synthetic.py quick_test --dataroot=NUSCENES_ROOT --map_folder=NUSCENES_MAP_ROOT --gpuid=0 --nworkers=10
 
 -> {'min': tensor(0.2776), 'max': tensor(256.7013), 'mean': tensor(54.6309), 'median': tensor(13.1194), 'std': tensor(71.5134)}
 ```

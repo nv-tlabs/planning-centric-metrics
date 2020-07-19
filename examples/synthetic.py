@@ -66,7 +66,7 @@ def quick_test(dataroot='/data/nuscenes',
                          nworkers, bsz=128,
                          plot_kextremes=5,
                          verbose=True)
-    print(info)
+    print({k: v for k,v in info.items() if k != 'full'})
 
 
 if __name__ == '__main__':
