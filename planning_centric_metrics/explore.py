@@ -330,7 +330,8 @@ def eval_test(version, eval_set, result_path, modelpath='./planner.pt',
               dataroot='/data/nuscenes',
               map_folder='/data/nuscenes/mini/',
               nworkers=10, plot_kextremes=5,
-              gpuid=0, mask_json='./masks_trainval.json'):
+              gpuid=0, mask_json='./masks_trainval.json',
+              save_output=None):
     """Evaluate detections with PKL.
     """
     nusc = NuScenes(version='v1.0-{}'.format(version),
@@ -349,7 +350,11 @@ def eval_test(version, eval_set, result_path, modelpath='./planner.pt',
                          plot_kextremes=plot_kextremes,
                          modelpath=modelpath,
                          mask_json=mask_json)
-    print(info)
+    print({k: v for k,v in info.items() if k != 'full'})
+    if save_output is not None:
+        print('saving results to', save_output)
+        with open(save_output, 'w') as writer:
+            json.dump(info, writer)
 
 
 def generate_perfect(version, eval_set, dataroot='/data/nuscenes'):
@@ -405,3 +410,59 @@ def og_detection_eval(version, eval_set, result_path,
                               eval_set=eval_set,
                               output_dir='./res', verbose=True)
     nusc_eval.main(plot_examples=0, render_curves=False)
+
+
+def pkl_distribution_plot(pkl_result_path, plot_name='dist.jpg',
+                          ntrials=10):
+    with open(pkl_result_path, 'r') as reader:
+        info = json.load(reader)
+    vals = [val for val in info['full'].values()]
+
+    fig = plt.figure(figsize=(10, 4))
+    gs = mpl.gridspec.GridSpec(1, 2)
+
+    ax = plt.subplot(gs[0, 0])
+    plt.hist(vals, bins=40, range=(0, 2*info['mean']), label='Samples', color='b')
+    plt.axvline(info['mean'], label=f"Overall Mean PKL: {info['mean']:.01f}", c='g', linestyle='dashed')
+    plt.axvline(info['median'], label=f"Overall Median PKL: {info['median']:.01f}", c='r', linestyle='dashed')
+    plt.xlabel('PKL')
+    plt.ylabel('N samples')
+    plt.legend()
+    plt.xlim((0, 2*info['mean']))
+
+    ax_mean = plt.subplot(gs[0, 1])
+    for tr in range(ntrials):
+        # random order
+        vals = np.random.permutation(vals)
+        xs = np.arange(1, len(vals)+ 1)
+        # mean
+        ys = [np.mean(vals[:i]) for i in xs]
+        plt.sca(ax_mean)
+        if tr == 0:
+            plt.plot(xs, ys, 'b', alpha=0.5, label='Moving endpoint mean')
+            plt.axhline(info['mean'], label=f"Overall Mean PKL: {info['mean']:.01f}", c='g', linestyle='dashed')
+            plt.ylabel('Mean PKL')
+            plt.legend()
+            plt.xlabel('N samples')
+        else:
+            plt.plot(xs, ys, 'b', alpha=0.5)
+        # median
+        ys = [np.median(vals[:i]) for i in xs]
+        # plt.sca(ax_median)
+        if tr == 0:
+            plt.plot(xs, ys, 'r', alpha=0.5, label='Moving endpoint median')
+            plt.axhline(info['median'], label=f"Overall Median PKL: {info['median']:.01f}", c='k', linestyle='dashed')
+            plt.ylabel('Median PKL')
+            plt.legend()
+            plt.xlabel('N samples')
+        else:
+            plt.plot(xs, ys, 'r', alpha=0.5)
+    # plt.axhline(info['median'], label=f"Overall Median PKL: {info['median']:.01f}", c='r', linestyle='dashed')
+    ax_mean.set_ylim((0, 2*info['mean']))
+    # ax_median.set_ylim((0, 2*info['median']))
+
+    plt.tight_layout()
+    print('saving', plot_name)
+    plt.savefig(plot_name)
+    plt.close(fig)
+

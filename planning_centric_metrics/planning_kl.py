@@ -487,11 +487,12 @@ def calculate_pkl(gt_boxes, pred_boxes, sample_tokens, nusc,
                      masks.cpu(), pkls=all_pkls[worst_ixes])
 
     info = {
-        'min': all_pkls.min(),
-        'max': all_pkls.max(),
-        'mean': all_pkls.mean(),
-        'median': all_pkls.median(),
-        'std': all_pkls.std(),
+        'min': all_pkls.min().item(),
+        'max': all_pkls.max().item(),
+        'mean': all_pkls.mean().item(),
+        'median': all_pkls.median().item(),
+        'std': all_pkls.std().item(),
+        'full': {tok: pk.item() for tok,pk in zip(sample_tokens, all_pkls)},
     }
 
     return info
