@@ -37,6 +37,22 @@ def get_nusc_maps(map_folder):
     return nusc_maps
 
 
+def get_scene2samp(nusc, full):
+    scene2samp = {}
+    for token in full:
+        samp = nusc.get('sample', token)
+        scene = nusc.get('scene', samp['scene_token'])['name']
+        if not scene in scene2samp:
+            scene2samp[scene] = []
+        scene2samp[scene].append(token)
+    for scene in scene2samp:
+        scene2samp[scene] = sorted(scene2samp[scene],
+                key=lambda x: nusc.get('sample', x)['timestamp'],
+                )
+    return scene2samp
+
+
+
 def plot_box(box, lw, color, alpha=0.8):
     l, w = lw
     h = np.arctan2(box[3], box[2])

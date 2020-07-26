@@ -31,7 +31,8 @@ import matplotlib.pyplot as plt
 from .data import compile_data
 from .models import compile_model
 from .tools import (plot_box, SimpleLoss, synthetic_noise_trunk,
-                    safe_forward, PKLEval, get_nusc_maps)
+                    safe_forward, PKLEval, get_nusc_maps,
+                    get_scene2samp)
 from .planning_kl import make_rgba, render_observation
 
 
@@ -412,14 +413,21 @@ def og_detection_eval(version, eval_set, result_path,
     nusc_eval.main(plot_examples=0, render_curves=False)
 
 
-def pkl_distribution_plot(pkl_result_path, plot_name='dist.jpg',
-                          ntrials=10):
+def pkl_distribution_plot(version, pkl_result_path, plot_name='dist.jpg',
+                          ntrials=10, dataroot='/data/nuscenes'):
+    nusc = NuScenes(version='v1.0-{}'.format(version),
+                    dataroot=os.path.join(dataroot, version),
+                    verbose=True)
+
     with open(pkl_result_path, 'r') as reader:
         info = json.load(reader)
     vals = [val for val in info['full'].values()]
 
-    fig = plt.figure(figsize=(10, 4))
-    gs = mpl.gridspec.GridSpec(1, 2)
+    # need to get scene->samples (ordered by timestamp)
+    scene2samp = get_scene2samp(nusc, info['full'])
+
+    fig = plt.figure(figsize=(15, 4))
+    gs = mpl.gridspec.GridSpec(1, 3)
 
     ax = plt.subplot(gs[0, 0])
     plt.hist(vals, bins=40, range=(0, 2*info['mean']), label='Samples', color='b')
@@ -441,7 +449,6 @@ def pkl_distribution_plot(pkl_result_path, plot_name='dist.jpg',
         if tr == 0:
             plt.plot(xs, ys, 'b', alpha=0.5, label='Moving endpoint mean')
             plt.axhline(info['mean'], label=f"Overall Mean PKL: {info['mean']:.01f}", c='g', linestyle='dashed')
-            plt.ylabel('Mean PKL')
             plt.legend()
             plt.xlabel('N samples')
         else:
@@ -452,7 +459,7 @@ def pkl_distribution_plot(pkl_result_path, plot_name='dist.jpg',
         if tr == 0:
             plt.plot(xs, ys, 'r', alpha=0.5, label='Moving endpoint median')
             plt.axhline(info['median'], label=f"Overall Median PKL: {info['median']:.01f}", c='k', linestyle='dashed')
-            plt.ylabel('Median PKL')
+            plt.ylabel('PKL')
             plt.legend()
             plt.xlabel('N samples')
         else:
@@ -460,6 +467,28 @@ def pkl_distribution_plot(pkl_result_path, plot_name='dist.jpg',
     # plt.axhline(info['median'], label=f"Overall Median PKL: {info['median']:.01f}", c='r', linestyle='dashed')
     ax_mean.set_ylim((0, 2*info['mean']))
     # ax_median.set_ylim((0, 2*info['median']))
+
+    ax = plt.subplot(gs[0, 2])
+    medians = []
+    means = []
+    for nperscene in range(1, 25):
+        tokens = []
+        for scene in scene2samp:
+            ixes = np.round(np.linspace(0, len(scene2samp[scene]) - 1, nperscene))
+            tokens.extend([scene2samp[scene][int(ix)] for ix in ixes])
+        medians.append(
+            (nperscene, np.median([info['full'][token] for token in tokens]))
+            )
+        means.append(
+            (nperscene, np.mean([info['full'][token] for token in tokens]))
+            )
+    plt.plot([row[0] for row in means], [row[1] for row in means], 'b', label='Mean PKL')
+    plt.plot([row[0] for row in medians], [row[1] for row in medians], 'r', label='Median PKL')
+    plt.axhline(info['median'], label=f"Overall Median PKL: {info['median']:.01f}", c='r', linestyle='dashed')
+    plt.axhline(info['mean'], label=f"Overall Mean PKL: {info['mean']:.01f}", c='b', linestyle='dashed')
+    plt.legend()
+    plt.xlabel('N samples per scene')
+    plt.ylabel('PKL')
 
     plt.tight_layout()
     print('saving', plot_name)
