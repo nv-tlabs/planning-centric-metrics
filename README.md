@@ -130,6 +130,14 @@ For `drop_p=1.0`, the 5 timestamps with the highest PKL (high is bad) under the 
 
 <img src="./imgs/worst.gif">
 
+### PKL Distribution
+Analyze the distribution of PKL values for a given submission.
+
+```
+python main.py pkl_distribution_plot trainval --pkl_result_path=SUBMISSION --dataroot=NUSCENES_ROOT
+```
+<img src="./imgs/dist.jpg">
+
 ### (optional) Sensitivity visualization
 To investigate what PKL is sensitive to, visualize the importance of each ground-truth object by removing it from the scene and computing the PKL.
 

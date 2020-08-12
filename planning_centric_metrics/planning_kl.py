@@ -148,7 +148,7 @@ def render_observation(x):
     plt.imshow(showimg, origin='lower')
 
     # road div
-    showimg = make_rgba(x[1].numpy().T, (0.0, 0.0, 0.55))
+    showimg = make_rgba(x[1].numpy().T, (159./255., 0.0, 1.0))
     plt.imshow(showimg, origin='lower')
 
     # lane div
@@ -190,7 +190,7 @@ def analyze_plot(gtxs, predxs, gtdist_sig, preddist_sig, masks, pkls=None):
                                                          gtdist_sig,
                                                          preddist_sig)):
         fig = plt.figure(figsize=(9, 6))
-        gs = mpl.gridspec.GridSpec(2, 3, left=0, bottom=0, right=1, top=1,
+        gs = mpl.gridspec.GridSpec(2, 3, left=0.01, bottom=0.01, right=0.99, top=0.99,
                                    wspace=0, hspace=0)
         ax = plt.subplot(gs[0, 0])
         render_observation(gtx)

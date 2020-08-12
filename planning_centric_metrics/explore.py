@@ -45,7 +45,10 @@ def viz_data(version, dataroot='/data/nuscenes',
     trainloader, valloader = compile_data(version, dataroot, map_folder,
                                           ego_only, t_spacing,
                                           bsz, num_workers, flip_aug)
-
+    def style_ax():
+        plt.grid(b=None)
+        plt.xticks([])
+        plt.yticks([])
     for ix, (xs, ys) in enumerate(valloader):
         for rowi, (x, y) in enumerate(zip(xs, ys)):
             fig = plt.figure(figsize=(6*(x.shape[0]+2), 6))
@@ -54,9 +57,17 @@ def viz_data(version, dataroot='/data/nuscenes',
             for i in range(x.shape[0]):
                 plt.subplot(gs[0, i])
                 plt.imshow(x[i].T, origin='lower', vmin=0, vmax=1)
+                style_ax()
 
             plt.subplot(gs[0, i+1])
-            plt.imshow(y.sum(0).T, origin='lower', vmin=0, vmax=1)
+            for ti in range(y.shape[0]):
+                first = y[ti].max(0)
+                second = first.values.max(0)
+                second_ix = second.indices.item()
+                first_ix = first.indices[second_ix].item()
+                plt.plot([first_ix], [second_ix], '.')
+            plt.imshow(y.sum(0).T, origin='lower', vmin=0, vmax=1, alpha=0.0)
+            style_ax()
 
             plt.subplot(gs[0, i+2])
             render_observation(x)
@@ -227,9 +238,9 @@ def false_neg_viz(version, modelpath,
                 for poly in lmap[layer_name]:
                     plt.fill(poly[:, 0], poly[:, 1], 'g')
             for poly in lmap['road_divider']:
-                plt.plot(poly[:, 0], poly[:, 1], 'k')
+                plt.plot(poly[:, 0], poly[:, 1], c=(159./255., 0.0, 1.0))
             for poly in lmap['lane_divider']:
-                plt.plot(poly[:, 0], poly[:, 1], 'b')
+                plt.plot(poly[:, 0], poly[:, 1], c=(0.0, 0.0, 1.0))
 
             # plot objects
             for lobj, lw, pkl in zip(lobjs, lws, pkls):
@@ -415,6 +426,18 @@ def og_detection_eval(version, eval_set, result_path,
 
 def pkl_distribution_plot(version, pkl_result_path, plot_name='dist.jpg',
                           ntrials=10, dataroot='/data/nuscenes'):
+    SMALL_SIZE = 14
+    MEDIUM_SIZE = 16
+    BIGGER_SIZE = 18
+
+    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
     nusc = NuScenes(version='v1.0-{}'.format(version),
                     dataroot=os.path.join(dataroot, version),
                     verbose=True)
