@@ -131,7 +131,7 @@ For `drop_p=1.0`, the 5 timestamps with the highest PKL (high is bad) under the 
 <img src="./imgs/worst.gif">
 
 ### PKL Distribution
-Analyze the distribution of PKL values for a given submission.
+Analyze the distribution of PKL values for a given submission. Image shown below is the output for [https://github.com/poodarchu/Det3D/tree/master/examples/cbgs](MEGVII val detections).
 
 ```
 python main.py pkl_distribution_plot trainval --pkl_result_path=SUBMISSION --dataroot=NUSCENES_ROOT
