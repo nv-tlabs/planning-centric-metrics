@@ -430,7 +430,8 @@ def calculate_pkl(gt_boxes, pred_boxes, sample_tokens, nusc,
         os.system(cmd)
     if verbose:
         print(f'using model weights {modelpath}')
-    model.load_state_dict(torch.load(modelpath))
+    model.load_state_dict(torch.load(modelpath, map_location=torch.device('cpu')))
+    model.to(device)
     model.eval()
 
     # load masks
