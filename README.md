@@ -23,6 +23,17 @@ month = {June},
 year = {2020}
 }
 ```
+and/or our [follow-up](https://arxiv.org/abs/2010.09350) with [Motional](https://motional.com/) that led to PKL being added to the [nuScenes detection leaderboard](https://www.nuscenes.org/object-detection)
+```
+@misc{guo2020efficacy,
+title={The efficacy of Neural Planning Metrics: A meta-analysis of PKL on nuScenes}, 
+author={Yiluan Guo and Holger Caesar and Oscar Beijbom and Jonah Philion and Sanja Fidler},
+year={2020},
+eprint={2010.09350},
+archivePrefix={arXiv},
+primaryClass={cs.CV}
+}
+```
 
 ## Quick Start
 
